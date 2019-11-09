@@ -3,9 +3,15 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 const path = require('path');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const rateLimit = require('express-rate-limit');
+
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const connectDB = require('./config/db');
+const mongoSanitize = require('express-mongo-sanitize');
 const errorHandler = require('./middleware/error');
 // Load env VARS
 dotenv.config({ path: './config/config.env' });
@@ -36,7 +42,27 @@ if (process.env.NODE_ENV === 'development') {
 // File uploading
 app.use(fileUpload());
 
-//Set static folder
+// Sanitize data
+app.use(mongoSanitize());
+
+// Set security headers
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(xss());
+
+// Rate limiting
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000, // 10 mins
+	max: 100
+});
+
+app.use(limiter);
+
+// Prevent HTTP params pollution
+app.use(hpp());
+
+// Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount Routers

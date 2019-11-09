@@ -20,7 +20,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 // Re-route into other resource routers
 router.use('/:bootcampId/courses', courseRouter); // if the request has bootcampId/courses, then it wil get re-routed to ./courses
-router.use('/:bootcampId/reviews', reviewRouter); // if the request has bootcampId/courses, then it wil get re-routed to ./courses
+router.use('/:bootcampId/reviews', reviewRouter); // if the request has bootcampId/reviews, then it wil get re-routed to ./reviews
 
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
 router.route('/:id/photo').put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);
